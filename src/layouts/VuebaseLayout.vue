@@ -277,7 +277,7 @@ export default {
         {
           icon: "comment",
           title: "mensajes",
-          link: ""
+          link: "/messages/index"
         }
       ],
       notificactions: [

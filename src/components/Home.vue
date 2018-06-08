@@ -10,7 +10,7 @@
         >
             <v-toolbar-title class="mx-auto" slot="extension">
                 <span>Bienvenido</span>
-                <h2>Administrador Aplicación piMT.</h2>
+                <h2>Administrador piMT</h2>
                 <v-layout row>
                     <v-flex wrap>
                         <v-btn outline large fab color="white" class="outine-2">

@@ -30,6 +30,23 @@ const routes = [
                 component: () => import('@/components/Dashboard/Logs')
             }
         ]
+    },
+    {
+        path: '/messages',
+        name: 'messages',
+        component: () => import('@/components/Messages/Layout'),
+        children: [
+            {
+                path: 'index',
+                name: 'messages.index',
+                component: () => import('@/components/Messages/Index')
+            },
+            {
+                path: 'new',
+                name: 'messages.new',
+                component: () => import('@/components/Messages/New')
+            }
+        ]
     }
 ]
 
