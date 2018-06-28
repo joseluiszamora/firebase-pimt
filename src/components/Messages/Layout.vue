@@ -40,7 +40,7 @@
                 tabs: null,
                 tabsItems: [
                     {id: 1, title: 'Inicio', link: 'index'},
-                    {id: 1, title: 'Nuevo', link: 'new'}
+                    {id: 2, title: 'Nuevo', link: 'new'}
                 ]
             }
         }

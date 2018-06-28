@@ -5,48 +5,48 @@ Vue.use(VueRouter)
 
 const routes = [
     {
-        path: '/',
-        name: 'home',
-        component: () => import('@/components/Home')
+      path: '/',
+      name: 'home',
+      component: () => import('@/components/Home')
     },
     {
-        path: '/dashboard',
-        name: 'dashboard',
-        component: () => import('@/components/Dashboard/Layout'),
-        children: [
-            {
-                path: 'indicators',
-                name: 'dashboard.indicators',
-                component: () => import('@/components/Dashboard/Indicators')
-            },
-            {
-                path: 'backup',
-                name: 'dashboard.backup',
-                component: () => import('@/components/Dashboard/Backup')
-            },
-            {
-                path: 'logs',
-                name: 'dashboard.logs',
-                component: () => import('@/components/Dashboard/Logs')
-            }
-        ]
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/components/Dashboard/Layout'),
+      children: [
+        {
+          path: 'indicators',
+          name: 'dashboard.indicators',
+          component: () => import('@/components/Dashboard/Indicators')
+        },
+        {
+          path: 'backup',
+          name: 'dashboard.backup',
+          component: () => import('@/components/Dashboard/Backup')
+        },
+        {
+          path: 'logs',
+          name: 'dashboard.logs',
+          component: () => import('@/components/Dashboard/Logs')
+        }
+      ]
     },
     {
-        path: '/messages',
-        name: 'messages',
-        component: () => import('@/components/Messages/Layout'),
-        children: [
-            {
-                path: 'index',
-                name: 'messages.index',
-                component: () => import('@/components/Messages/Index')
-            },
-            {
-                path: 'new',
-                name: 'messages.new',
-                component: () => import('@/components/Messages/New')
-            }
-        ]
+      path: '/messages',
+      name: 'messages',
+      component: () => import('@/components/Messages/Layout'),
+      children: [
+        {
+          path: 'index',
+          name: 'messages.index',
+          component: () => import('@/components/Messages/Index')
+        },
+        {
+          path: 'new',
+          name: 'messages.new',
+          component: () => import('@/components/Messages/New')
+        }
+      ]
     }
 ]
 
