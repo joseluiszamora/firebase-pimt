@@ -4,10 +4,10 @@
       v-toolbar-side-icon
       v-toolbar-title Nuevo Mensaje
       v-spacer
-      v-btn(icon)
+      v-btn(icon, @click.native="showAlive = !showAlive")
         v-icon visibility
     v-layout(row, wrap, pt-3)
-      v-flex.md6
+      v-flex(:class='liveClass()')
         form.px-2
           v-layout(row, justify-center)
             v-flex.xs12
@@ -76,6 +76,12 @@
       }
     },
     methods: {
+      liveClass () {
+        if (this.showAlive) {
+          return 'md6'
+        }
+        return 'md12'
+      },
       closeForm () {
       },
       clear () {
