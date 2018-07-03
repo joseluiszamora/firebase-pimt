@@ -22,8 +22,8 @@
         </v-toolbar>
 
         <v-container>
-            <v-layout row>
-                <v-flex xs12 md8 offset-md2>
+            <v-layout row justify-center>
+                <v-flex xs12 md12>
                     <v-slide-y-transition mode="out-in">
                         <router-view />
                     </v-slide-y-transition>
