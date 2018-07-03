@@ -1,70 +1,79 @@
 <template lang="pug">
-  v-card(color='white')
-    v-toolbar(color='primary', dark)
-      v-toolbar-side-icon
-      v-toolbar-title Nuevo Mensaje
-      v-spacer
-      v-btn(icon, @click.native="showAlive = !showAlive")
-        v-icon visibility
-    v-layout(row, wrap, pt-3)
-      v-flex(:class='liveClass()')
-        form.px-2
-          v-layout(row, justify-center)
-            v-flex.xs12
-              v-text-field(label='Titulo', v-model='tituloForm', required)
-          v-layout(row, justify-center)
-            v-flex.xs12
-              v-text-field(label='Mensaje', v-model='mensajeForm', multi-line)
-          v-layout(row, wrap)
-            v-flex(xs12)
-              #drop(@drop='handleDrop', @click='handleDrop', @dragover='handleDragover', @dragenter='handleDragover') Click o Arrastre Aqui (jpg, png, jpeg)
-                input(type='file', @change='onFileChange', multiple)
-          v-layout(row, justify-center)
-            v-flex.xs12
-              v-btn(dark, color='deep-orange', @click='closeForm')
-                | Cancelar 
-                v-icon clear
-              v-btn(dark, color='orange', @click='clear')
-                v-icon refresh
-              v-btn(dark, color='green', @click='sendMessage2')
-                | Guardar 
-                v-icon save
-      v-flex.md6(v-if="showAlive")
-        v-slide-y-transition(mode="out-in")
-          v-card(color='white')
-            v-card-text.display-1(style="text-align:center;") {{ tituloForm }}
-            v-card-text {{ mensajeForm }}
-            v-card(v-if="imageForm != null")
-              v-card-media
-                img(:src="imageForm", height="300")
+  div
+    //v-card(color='white')
+      v-toolbar(color='primary', dark)
+        v-toolbar-side-icon
+        v-toolbar-title Nuevo Mensaje
+        v-spacer
+        v-btn(icon, @click.native="showAlive = !showAlive")
+          v-icon visibility
+      v-layout(row, wrap, pt-3)
+        v-flex(:class='liveClass()')
+          form.px-2
+            v-layout(row, justify-center)
+              v-flex.xs12
+                v-text-field(label='Titulo', v-model='tituloForm', required)
+            v-layout(row, justify-center)
+              v-flex.xs12
+                v-text-field(label='Mensaje', v-model='mensajeForm', multi-line)
+            v-layout(row, wrap)
+              v-flex(xs12)
+                #drop(@drop='handleDrop', @click='handleDrop', @dragover='handleDragover', @dragenter='handleDragover') Click o Arrastre Aqui (jpg, png, jpeg)
+                  input(type='file', @change='onFileChange', multiple)
+            v-layout(row, justify-center)
+              v-flex.xs12
+                v-btn(dark, color='deep-orange', @click='closeForm')
+                  | Cancelar 
+                  v-icon clear
+                v-btn(dark, color='orange', @click='clear')
+                  v-icon refresh
+                v-btn(dark, color='green', @click='sendMessage2')
+                  | Guardar 
+                  v-icon save
+        v-flex.md6(v-if="showAlive")
+          v-slide-y-transition(mode="out-in")
+            v-card(color='white')
+              v-card-text.display-1(style="text-align:center;") {{ tituloForm }}
+              v-card-text {{ mensajeForm }}
+              v-card(v-if="imageForm != null")
+                v-card-media
+                  img(:src="imageForm", height="300")
 
-  //v-flex.md12.pt-4
+    //v-flex.md12.pt-4
+      v-card(color='white')
+        v-card-text Entregar a :
+
     v-card(color='white')
-      v-card-text Entregar a :
-        
+      v-toolbar(color='primary', dark)
+        v-toolbar-side-icon
+        v-toolbar-title Enviar a :
+        v-spacer
+        v-btn(icon)
+          v-icon visibility
+      v-layout(row, wrap, pt-3)
+        v-data-table.elevation-1(v-model="selected", :headers="headers", :items="desserts", :pagination.sync="pagination", select-all="", item-key="name")
+          template(slot="headers", slot-scope="props")
+            tr
+              th
+                v-checkbox(:input-value="props.all", :indeterminate="props.indeterminate", primary="", hide-details="", @click.native="toggleAll")
+              th(v-for="header in props.headers", :key="header.text", :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']", @click="changeSort(header.value)")
+                v-icon(small="") arrow_upward
+                | {{ header.text }}
+          template(slot="items", slot-scope="props")
+            tr(:active="props.selected", @click="props.selected = !props.selected")
+              td
+                v-checkbox(:input-value="props.selected", primary="", hide-details="")
+              td {{ props.item.name }}
+              td.text-xs-right {{ props.item.calories }}
+              td.text-xs-right {{ props.item.fat }}
+              td.text-xs-right {{ props.item.carbs }}
+              td.text-xs-right {{ props.item.protein }}
+              td.text-xs-right {{ props.item.iron }}
+      
 </template>
 
 <script>
   import http from '@/http/firebase'
-  const functions = require('firebase-functions')
-  const admin = require('firebase-admin')
-  var serviceAccount = require('../../config/pimt-mt-firebase-adminsdk.json');
-
-  admin.initializeApp(functions.config().firebase)
-  /* admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://pimt-mt.firebaseio.com"
-  }) */
-
-  /* admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://pimt-mt.firebaseio.com"
-  })
-  admin.initializeApp({
-    credential: admin.credential.refreshToken('../../config/pimt-mt-firebase-adminsdk.json'),
-    databaseURL: "https://pimt-mt.firebaseio.com"
-  }) */
-
   export default {
     data () {
       return {
@@ -72,7 +81,114 @@
         mensajeForm: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras suscipit pulvinar ante, nec porttitor neque pulvinar vel. Phasellus nec elit eget eros luctus molestie. Donec nulla urna, euismod nec tortor id, ultricies viverra turpis. Integer ac enim vitae nisi congue vestibulum quis id tellus. Nunc id varius metus. Suspendisse a eros elementum, commodo eros sed, feugiat libero. Donec consectetur accumsan risus, et convallis magna. Duis euismod, erat ut laoreet consectetur, purus turpis vestibulum lorem, eu condimentum quam sem eget felis. Ut ac ornare eros. Curabitur purus dolor, vehicula id velit id, facilisis suscipit lorem. Sed vitae tincidunt diam. Suspendisse potenti. Proin dapibus arcu dignissim, scelerisque mauris eget, dapibus quam.',
         imageForm: null,
         showAlive: true,
-
+        pagination: {
+          sortBy: 'name'
+        },
+        selected: [],
+        headers: [
+          {
+            text: 'Dessert (100g serving)',
+            align: 'left',
+            value: 'name'
+          },
+          { text: 'Calories', value: 'calories' },
+          { text: 'Fat (g)', value: 'fat' },
+          { text: 'Carbs (g)', value: 'carbs' },
+          { text: 'Protein (g)', value: 'protein' },
+          { text: 'Iron (%)', value: 'iron' }
+        ],
+        desserts: [
+          {
+            value: false,
+            name: 'Frozen Yogurt',
+            calories: 159,
+            fat: 6.0,
+            carbs: 24,
+            protein: 4.0,
+            iron: '1%'
+          },
+          {
+            value: false,
+            name: 'Ice cream sandwich',
+            calories: 237,
+            fat: 9.0,
+            carbs: 37,
+            protein: 4.3,
+            iron: '1%'
+          },
+          {
+            value: false,
+            name: 'Eclair',
+            calories: 262,
+            fat: 16.0,
+            carbs: 23,
+            protein: 6.0,
+            iron: '7%'
+          },
+          {
+            value: false,
+            name: 'Cupcake',
+            calories: 305,
+            fat: 3.7,
+            carbs: 67,
+            protein: 4.3,
+            iron: '8%'
+          },
+          {
+            value: false,
+            name: 'Gingerbread',
+            calories: 356,
+            fat: 16.0,
+            carbs: 49,
+            protein: 3.9,
+            iron: '16%'
+          },
+          {
+            value: false,
+            name: 'Jelly bean',
+            calories: 375,
+            fat: 0.0,
+            carbs: 94,
+            protein: 0.0,
+            iron: '0%'
+          },
+          {
+            value: false,
+            name: 'Lollipop',
+            calories: 392,
+            fat: 0.2,
+            carbs: 98,
+            protein: 0,
+            iron: '2%'
+          },
+          {
+            value: false,
+            name: 'Honeycomb',
+            calories: 408,
+            fat: 3.2,
+            carbs: 87,
+            protein: 6.5,
+            iron: '45%'
+          },
+          {
+            value: false,
+            name: 'Donut',
+            calories: 452,
+            fat: 25.0,
+            carbs: 51,
+            protein: 4.9,
+            iron: '22%'
+          },
+          {
+            value: false,
+            name: 'KitKat',
+            calories: 518,
+            fat: 26.0,
+            carbs: 65,
+            protein: 7,
+            iron: '6%'
+          }
+        ]
       }
     },
     methods: {
@@ -92,65 +208,6 @@
         }, (error) => {
           this.showError = true
           console.log(error)
-        })
-      },
-      getToken () {
-        return new Promise(function(resolve, reject) {
-          var key = require('../../config/pimt-mt-firebase-adminsdk.json');
-          var jwtClient = new google.auth.JWT(
-            key.client_email,
-            null,
-            key.private_key,
-            SCOPES,
-            null
-          );
-          jwtClient.authorize(function(err, tokens) {
-            if (err) {
-              reject(err);
-              return;
-            }
-            resolve(tokens.access_token);
-          });
-        });
-      },
-      sendMessage () {
-        // This registration token comes from the client FCM SDKs.
-        var registrationToken = 'emEbMgxCNs8:APA91bHEPWs9DlFe6__ZlspbRZqoOKF4aFbnFs-UUd3z4kiAzq1Sg1gQYgOrEMJ8bApIlgS4_UlqcOZknDA_6i5QbLrxnYESRW255NEl4xUy6je1ilZmx67kPHVkzP3W5yyNIxiuSx-vEmwDKzeqnRjkk8BB6QcGGA'
-        // See documentation on defining a message payload.
-        var message = {
-          data: {
-            score: '850',
-            time: '2:45'
-          },
-          token: registrationToken
-        }
-        // Send a message to the device corresponding to the provided
-        // registration token.
-        admin.messaging().send(message)
-        .then((response) => {
-          // Response is a message ID string.
-          console.log('Successfully sent message:', response)
-        })
-        .catch((error) => {
-          console.log('Error sending message:', error)
-        });
-      },
-      sendMessage2 () {
-        console.log('Message 2')
-        var payload = {
-          notification: {
-            title: "This is a Notification",
-            body: "This is the body of the notification message."
-          }
-        }
-        var registrationToken = 'emEbMgxCNs8:APA91bHEPWs9DlFe6__ZlspbRZqoOKF4aFbnFs-UUd3z4kiAzq1Sg1gQYgOrEMJ8bApIlgS4_UlqcOZknDA_6i5QbLrxnYESRW255NEl4xUy6je1ilZmx67kPHVkzP3W5yyNIxiuSx-vEmwDKzeqnRjkk8BB6QcGGA'
-
-        admin.messaging().sendToDevice(registrationToken, payload)
-        .then(function(response) {
-          console.log("Successfully sent message:", response)
-        })
-        .catch(function(error) {
-          console.log("Error sending message:", error)
         })
       },
       handleDrop (e) { // arrastrar una imagen
@@ -204,6 +261,18 @@
         this.tituloForm = null
         this.mensajeForm = null
         this.imageForm = null
+      },
+      toggleAll () {
+        if (this.selected.length) this.selected = []
+        else this.selected = this.desserts.slice()
+      },
+      changeSort (column) {
+        if (this.pagination.sortBy === column) {
+          this.pagination.descending = !this.pagination.descending
+        } else {
+          this.pagination.sortBy = column
+          this.pagination.descending = false
+        }
       }
     }
   }
