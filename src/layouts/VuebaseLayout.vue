@@ -253,7 +253,7 @@ export default {
         {
           icon: "supervisor_account",
           title: "Usuarios",
-          link: ""
+          link: "/usuarios/index"
         }
       ],
       analyticsItems: [
