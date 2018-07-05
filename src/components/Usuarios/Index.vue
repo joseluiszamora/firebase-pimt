@@ -6,10 +6,19 @@
       v-spacer
       //v-btn(icon)
         v-icon visibility
+    
+    v-layout(row, wrap, justify-end)
+      v-flex.md6
+        v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="search")
     v-layout(row, wrap, pt-3)
       v-flex.md12
         loader(message="Cargando Usuarios", v-show="loaderUsuarios")
-        v-data-table.elevation-1(v-model="selected", :headers="headers", :items="usuarios", :pagination.sync="pagination", select-all, item-key="id")
+        v-data-table.elevation-1(
+          v-model="selected", 
+          :headers="headers", 
+          :items="usuarios", 
+          :search="search", 
+          :pagination.sync="pagination", select-all, item-key="id")
           template(slot="headers", slot-scope="props")
             tr
               th(v-for="header in props.headers", :key="header.text", :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']", @click="changeSort(header.value)")
@@ -42,6 +51,7 @@
         imageForm: null,
         showAlive: true,
         usuarios: [],
+        search: '',
         loaderUsuarios: false,
         pagination: {
           sortBy: 'ci'
@@ -62,10 +72,21 @@
         http.getAllUsuarios().then(res => {
           this.usuarios = res.data.data
           this.loaderUsuarios = false
-          console.log(res.data.data)
         }, (error) => {
           console.log(error)
         })
+      },
+      toggleAll () {
+        if (this.selected.length) this.selected = []
+        else this.selected = this.usuarios.slice()
+      },
+      changeSort (column) {
+        if (this.pagination.sortBy === column) {
+          this.pagination.descending = !this.pagination.descending
+        } else {
+          this.pagination.sortBy = column
+          this.pagination.descending = false
+        }
       }
     },
     created () {

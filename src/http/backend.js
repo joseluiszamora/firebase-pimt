@@ -40,4 +40,9 @@ http.saveAgrupacion = function (agrupacion) {
   return http.post('/agrupacion/crearbloque', agrupacion)
 }
 
+// IMAGENES
+http.saveImage = function (image) {
+  return http.post('archivo/saveimage/', image)
+}
+
 export default http

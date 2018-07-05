@@ -5,8 +5,10 @@
         v-toolbar-side-icon
         v-toolbar-title Nuevo Mensaje
         v-spacer
-        v-btn(icon, @click.native="showAlive = !showAlive")
-          v-icon visibility
+        v-tooltip(top)
+          v-btn(icon, @click.native="showAlive = !showAlive", slot='activator')
+            v-icon(v-html="showAlive ? 'visibility_off' : 'visibility'")
+          span(v-html="showAlive ? 'Ocultar mensaje compuesto' : 'Ver mensaje compuesto'")
       v-layout(row, wrap, pt-3)
         v-flex(:class='liveClass()')
           form.px-2
@@ -37,64 +39,139 @@
               v-card-text {{ mensajeForm }}
               v-card(v-if="imageForm != null")
                 v-card-media
-                  img(:src="imageForm", height="300")
-
-    //v-flex.md12.pt-4
-      v-card(color='white')
-        v-card-text Entregar a :
+                  img(:src="makeImage()", height="300")
 
     v-card(color='white')
       v-toolbar(color='primary', dark)
-        v-toolbar-side-icon
         v-toolbar-title Enviar a :
         v-spacer
-        v-btn(icon)
-          v-icon visibility
+        v-tooltip(top)
+          v-btn(icon, @click.native="showDialogAddPersona = true", slot='activator')
+            v-icon person_add
+          span Agregar Persona
+          v-dialog(v-model='showDialogAddPersona', persistent, scrollable, max-width='400px')
+            v-card
+              v-card-title.title Agregar personas al grupo
+              v-divider
+              v-layout(row, wrap, px-3)
+                v-flex.md12
+                  v-card-text(style='max-height: 300px;')
+                    v-subheader Personas
+                    div(v-for='usuario in usuariosImportar', v-bind:key='usuario.id', style='height:30px;')
+                      v-checkbox(:label='usuario.nombre', v-model='usuario.select', light)
+                  v-divider
+                  v-card-actions
+                    v-spacer
+                    v-btn(color='grey darken-1', flat, @click.native='showDialogAddPersona = false') Cancelar
+                    v-btn(color='green darken-1', flat, @click='agregarUsuarios', v-if="countUsuariosParaImportar() > 0") Agregar ({{ countUsuariosParaImportar() }})
+        v-tooltip(top)
+          v-btn(icon, @click.native="", slot='activator')
+            v-icon group
+          span Agregar Grupo
+        v-tooltip(top)
+          v-btn(icon, @click.native="", slot='activator')
+            v-icon refresh
+          span Eliminar Todo
+      v-layout(row, wrap, justify-space-between)
+        v-flex.md2
+          v-btn.white--text(color='teal', round, @click.native="")
+            | Eliminar (29)
+
+        v-flex.md6
+          v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="search")
       v-layout(row, wrap, pt-3)
         loader(message="Cargando Usuarios", v-show="loaderUsuarios")
-        v-data-table.elevation-1(v-model="selected", :headers="headers", :items="usuarios", :pagination.sync="pagination", select-all, item-key="id")
-          template(slot="headers", slot-scope="props")
-            tr
-              th
-                v-checkbox(:input-value="props.all", :indeterminate="props.indeterminate", primary, hide-details, @click.native="toggleAll")
-              th(v-for="header in props.headers", :key="header.text", :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']", @click="changeSort(header.value)")
-                v-icon(small) arrow_upward
-                | {{ header.text }}
-          template(slot="items", slot-scope="props")
-            tr(:active="props.selected", @click="props.selected = !props.selected")
-              td
-                v-checkbox(:input-value="props.selected", primary, hide-details)
-              td {{ props.item.ci }}
-              td.text-xs-right {{ props.item.nombre_usuario }}
-              td.text-xs-right {{ props.item.nombre }}
-              td.text-xs-right {{ props.item.tipo }}
+        v-flex.md12
+          v-data-table.elevation-1(v-model="selected", :headers="headers", :items="usuarios", :pagination.sync="pagination", select-all, item-key="id", :search="search")
+            template(slot="headers", slot-scope="props")
+              tr
+                th
+                  v-checkbox(:input-value="props.all", :indeterminate="props.indeterminate", primary, hide-details, @click.native="toggleAll")
+                th(v-for="header in props.headers", :key="header.text", :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']", @click="changeSort(header.value)")
+                  v-icon(small) arrow_upward
+                  | {{ header.text }}
+            template(slot="items", slot-scope="props")
+              tr(:active="props.selected", @click="props.selected = !props.selected")
+                td
+                  v-checkbox(:input-value="props.selected", primary, hide-details)
+                td
+                  v-tooltip(top)
+                    imageprofile(:documento="props.item.ci || 'null'", :width="100", slot='activator')
+                    span {{ props.item.nombre }}
+                td.text-xs-center {{ props.item.ci }}
+                td.text-xs-center {{ props.item.nombre }}
+                td.text-xs-center {{ props.item.id }}
 </template>
 
 <script>
   import http from '@/http/backend'
   import loader from '../Shared/Loader.vue'
+  import imageprofile from '../Shared/Imageprofile.vue'
+  import config from '../../config'
   export default {
-    components: { loader },
+    components: { loader, imageprofile },
     data () {
       return {
         tituloForm: 'Este es el titulo',
         mensajeForm: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras suscipit pulvinar ante, nec porttitor neque pulvinar vel. Phasellus nec elit eget eros luctus molestie. Donec nulla urna, euismod nec tortor id, ultricies viverra turpis. Integer ac enim vitae nisi congue vestibulum quis id tellus. Nunc id varius metus. Suspendisse a eros elementum, commodo eros sed, feugiat libero. Donec consectetur accumsan risus, et convallis magna. Duis euismod, erat ut laoreet consectetur, purus turpis vestibulum lorem, eu condimentum quam sem eget felis. Ut ac ornare eros. Curabitur purus dolor, vehicula id velit id, facilisis suscipit lorem. Sed vitae tincidunt diam. Suspendisse potenti. Proin dapibus arcu dignissim, scelerisque mauris eget, dapibus quam.',
         imageForm: null,
         showAlive: true,
+        showDialogAddPersona: false,
+        search: '',
         usuarios: [],
+        usuariosImportar: [],
         loaderUsuarios: false,
         pagination: {
           sortBy: 'ci'
         },
         selected: [],
         headers: [
-          { text: 'Documento', value: 'ci' },
-          { text: 'Usuario', align: 'left', value: 'nombre_usuario' },
-          { text: 'Nombre', value: 'nombre' }
+          { text: '', value: '' },
+          { text: 'Documento', align: 'center', value: 'ci' },
+          { text: 'Nombre', align: 'center', value: 'nombre' },
+          { text: 'Grupo', value: 'nombre' }
         ]
       }
     },
     methods: {
+      agregarUsuarios () {
+        this.usuariosImportar.forEach(function (element) {
+          if (element.select) {
+            this.usuarios.push(element)
+          }
+        }, this)
+      },
+      countUsuariosParaImportar () {
+        let counter = 0
+        this.usuariosImportar.forEach(function (element) {
+          if (element.select) {
+            counter++
+          }
+        }, this)
+        return counter
+      },
+      getUsuariosImportar () {
+        this.usuariosImportar = []
+        http.getAllUsuarios().then(res => {
+          res.data.data.forEach(function (element) {
+            var bloqueado = false
+            /* this.usuarios.forEach(function (usuario) {
+              if (usuario.id === element.id) {
+                bloqueado = true
+              }
+            }, this) */
+
+            let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, ci: element.ci, bloqueado: bloqueado }
+            this.usuariosImportar.push(temp) 
+          }, this)
+        }, (error) => {
+          console.log(error)
+        })
+        console.log(this.usuariosImportar)
+      },
+      makeImage () {
+        return config.publicUrl + this.imageForm
+      },
       liveClass () {
         if (this.showAlive) {
           return 'md6'
@@ -151,7 +228,8 @@
         e.dataTransfer.dropEffect = 'copy'
       },
       sendToList (base64) { // agregar un elemento a la lista
-        this.imageForm = base64
+        //this.imageForm = base64
+        this.saveImagen(base64)
       },
       removeElement (key) { // remover imagen de la lista
         let tempArray = []
@@ -177,19 +255,18 @@
           this.pagination.descending = false
         }
       },
-      getAllUsuarios () {
-        this.loaderUsuarios = true
-        http.getAllUsuarios().then(res => {
-          this.usuarios = res.data.data
-          this.loaderUsuarios = false
-          console.log(res.data.data)
+      saveImagen (element) {
+        const image = `base64=${element}&folder=mensajes&descripcion=firebase`
+        http.saveImage(image).then(res => {
+          this.imageForm = res.data.archivo
         }, (error) => {
+          this.showError = true
           console.log(error)
         })
       }
     },
     created () {
-      this.getAllUsuarios()
+      this.getUsuariosImportar()
     }
   }
 </script>
