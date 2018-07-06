@@ -29,7 +29,7 @@
                   v-icon clear
                 v-btn(dark, color='orange', @click='clear')
                   v-icon refresh
-                v-btn(dark, color='green', @click='clear')
+                v-btn(dark, color='green', @click='submit')
                   | Guardar 
                   v-icon save
         v-flex.md6(v-if="showAlive")
@@ -74,15 +74,15 @@
           span Eliminar Todo
       v-layout(row, wrap, justify-space-between)
         v-flex.md2
-          v-btn.white--text(color='teal', round, @click.native="")
-            | Eliminar (29)
+          v-btn.white--text(color='teal', round, @click="quitarUsuarios", v-show="selected.length > 0")
+            | Eliminar ({{ selected.length }})
 
         v-flex.md6
           v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="search")
       v-layout(row, wrap, pt-3)
         loader(message="Cargando Usuarios", v-show="loaderUsuarios")
         v-flex.md12
-          v-data-table.elevation-1(v-model="selected", :headers="headers", :items="usuarios", :pagination.sync="pagination", select-all, item-key="id", :search="search")
+          v-data-table.elevation-1(v-model="selected", :headers="headers", :items="usuarios", :pagination.sync="pagination", select-all, item-key="id", :search="search", no-data-text="Ninguna persona")
             template(slot="headers", slot-scope="props")
               tr
                 th
@@ -134,10 +134,19 @@
       }
     },
     methods: {
+      quitarUsuarios () {
+        this.selected.forEach(function (element) {
+          var index = this.usuarios.indexOf(element)
+          this.usuarios.splice(index, 1)
+        }, this)
+      },
       agregarUsuarios () {
         this.usuariosImportar.forEach(function (element) {
           if (element.select) {
+            console.log(element)
+            element.select = false
             this.usuarios.push(element)
+            this.showDialogAddPersona = false
           }
         }, this)
       },
@@ -183,7 +192,12 @@
       clear () {
       }, 
       submit () {
-        http.sendMessage().then(res => {
+        var usuarios = ''
+        this.usuarios.forEach(function (element) {
+          usuarios += element.id + '-' + element.ci + '|'
+        }, this)
+        const mensaje = `titulo=${this.tituloForm}&mensaje=${this.mensajeForm}&imagen=${this.imageForm}&usuarios=${usuarios}`
+        http.saveMensaje(mensaje).then(res => {
           console.log(res)
         }, (error) => {
           this.showError = true

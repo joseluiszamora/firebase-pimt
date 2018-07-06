@@ -17,12 +17,6 @@ http.getAllUsuarios = function () {
 http.getAllUsuariosImportar = function (idGrupo) {
   return http.get('/usuario/importar/' + idGrupo)
 }
-http.sendMessage = function () {
-  let token = 'emEbMgxCNs8:APA91bHEPWs9DlFe6__ZlspbRZqoOKF4aFbnFs-UUd3z4kiAzq1Sg1gQYgOrEMJ8bApIlgS4_UlqcOZknDA_6i5QbLrxnYESRW255NEl4xUy6je1ilZmx67kPHVkzP3W5yyNIxiuSx-vEmwDKzeqnRjkk8BB6QcGGA'
-  let message = `"message":{"token":"${token}","notification":{"body":"This is an FCM notification message!","title":"FCM Message"}}`
-  // return http.post('/messages:send HTTP/1.1', message)
-  return http.post('/messages:send', message)
-}
 
 // USUARIOS GRUPO
 http.getUsuariosGrupo = function (idGrupo) {
@@ -44,5 +38,19 @@ http.saveAgrupacion = function (agrupacion) {
 http.saveImage = function (image) {
   return http.post('archivo/saveimage/', image)
 }
+// MENSAJES
+http.saveMensaje = function (mensaje) {
+  return http.post('/mensaje/create', mensaje)
+}
+http.getAllMensajes = function () {
+  return http.get('/mensaje')
+}
+http.sendMessage = function (mensaje) {
+  // let token = 'emEbMgxCNs8:APA91bHEPWs9DlFe6__ZlspbRZqoOKF4aFbnFs-UUd3z4kiAzq1Sg1gQYgOrEMJ8bApIlgS4_UlqcOZknDA_6i5QbLrxnYESRW255NEl4xUy6je1ilZmx67kPHVkzP3W5yyNIxiuSx-vEmwDKzeqnRjkk8BB6QcGGA'
+  // let message = `"message":{"token":"${token}","notification":{"body":"This is an FCM notification message!","title":"FCM Message"}}`
+  // return http.post('/messages:send HTTP/1.1', message)
+  return http.post('/mensaje/send', mensaje)
+}
+
 
 export default http
