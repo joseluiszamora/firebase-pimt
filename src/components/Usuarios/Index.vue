@@ -1,12 +1,10 @@
 <template lang="pug">
   v-card(color='white')
     v-toolbar(color='primary', dark)
-      v-toolbar-side-icon
       v-toolbar-title Todos los Usuarios
       v-spacer
-      //v-btn(icon)
-        v-icon visibility
-    
+      v-btn(icon, dark, @click.native="getAllUsuarios")
+        v-icon refresh
     v-layout(row, wrap, justify-end)
       v-flex.md6
         v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="search")
@@ -18,6 +16,7 @@
           :headers="headers", 
           :items="usuarios", 
           :search="search", 
+           v-show="!loaderUsuarios" 
           :pagination.sync="pagination", select-all, item-key="id")
           template(slot="headers", slot-scope="props")
             tr
