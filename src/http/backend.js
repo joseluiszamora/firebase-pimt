@@ -45,6 +45,9 @@ http.saveMensaje = function (mensaje) {
 http.getAllMensajes = function () {
   return http.get('/mensaje')
 }
+http.getUsuariosMensaje = function (idMensaje) {
+  return http.get('/usuariomensaje/usuarios/' + idMensaje)
+}
 http.sendMessage = function (mensaje) {
   // let token = 'emEbMgxCNs8:APA91bHEPWs9DlFe6__ZlspbRZqoOKF4aFbnFs-UUd3z4kiAzq1Sg1gQYgOrEMJ8bApIlgS4_UlqcOZknDA_6i5QbLrxnYESRW255NEl4xUy6je1ilZmx67kPHVkzP3W5yyNIxiuSx-vEmwDKzeqnRjkk8BB6QcGGA'
   // let message = `"message":{"token":"${token}","notification":{"body":"This is an FCM notification message!","title":"FCM Message"}}`
