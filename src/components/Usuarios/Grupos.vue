@@ -29,6 +29,9 @@
                       v-btn(color='grey darken-1', flat, @click.native='showDialogNewGroup = false') Cancelar
                       v-btn(color='green darken-1', flat, @click='saveGrupo') Guardar
 
+          v-layout(row, wrap, justify-end)
+            v-flex.md8
+              v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="search")
           v-layout(row, wrap, pt-3)
             v-flex.md12
               loader(message="Cargando Usuarios", v-show="loaderGrupos")
@@ -36,7 +39,9 @@
                 v-model="selected", 
                 :headers="headers", 
                 :items="grupos", 
+                :search="search",
                 :pagination.sync="pagination", 
+                :rows-per-page-items="pag" 
                 no-data-text="Ningun grupo", 
                 select-all, item-key="id")
                 template(slot="headers", slot-scope="props")
@@ -62,6 +67,7 @@
     components: { loader, imageprofile, personasGrupo },
     data () {
       return {
+        search: '',
         tituloForm: 'Este es el titulo',
         mensajeForm: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras suscipit pulvinar ante, nec porttitor neque pulvinar vel. Phasellus nec elit eget eros luctus molestie. Donec nulla urna, euismod nec tortor id, ultricies viverra turpis. Integer ac enim vitae nisi congue vestibulum quis id tellus. Nunc id varius metus. Suspendisse a eros elementum, commodo eros sed, feugiat libero. Donec consectetur accumsan risus, et convallis magna. Duis euismod, erat ut laoreet consectetur, purus turpis vestibulum lorem, eu condimentum quam sem eget felis. Ut ac ornare eros. Curabitur purus dolor, vehicula id velit id, facilisis suscipit lorem. Sed vitae tincidunt diam. Suspendisse potenti. Proin dapibus arcu dignissim, scelerisque mauris eget, dapibus quam.',
         imageForm: null,
@@ -73,6 +79,7 @@
         pagination: {
           sortBy: 'ci'
         },
+        pag: [10, 20, 50, { text: 'Todos', value: -1 }],
         selected: [],
         headers: [
           { text: 'Codigo', align: 'center', value: 'codigo' },
