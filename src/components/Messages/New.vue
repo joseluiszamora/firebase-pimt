@@ -20,7 +20,7 @@
                 v-text-field(label='Mensaje', v-model='mensajeForm', multi-line)
             v-layout(row, wrap)
               v-flex(xs12)
-                #drop(@drop='handleDrop', @click='handleDrop', @dragover='handleDragover', @dragenter='handleDragover') Click o Arrastre Aqui (jpg, png, jpeg)
+                #drop(@drop='handleDrop', @click='handleDrop', @dragover='handleDragover', @dragenter='handleDragover') {{ messageImageLoader }}
                   input(type='file', @change='onFileChange', multiple)
             v-layout(row, justify-center)
               v-flex.xs12
@@ -45,13 +45,14 @@
       v-toolbar(color='primary', dark)
         v-toolbar-title Enviar a :
         v-spacer
+        
         v-tooltip(top)
           v-btn(icon, @click.native="showDialogAddPersona = true", slot='activator')
             v-icon person_add
           span Agregar Persona
           v-dialog(v-model='showDialogAddPersona', persistent, scrollable, max-width='400px')
             v-card
-              v-card-title.title Agregar personas al grupo
+              v-card-title.title Agregar Personas
               v-divider
               v-layout(row, wrap, px-3)
                 v-flex.md12
@@ -64,10 +65,27 @@
                     v-spacer
                     v-btn(color='grey darken-1', flat, @click.native='showDialogAddPersona = false') Cancelar
                     v-btn(color='green darken-1', flat, @click='agregarUsuarios', v-if="countUsuariosParaImportar() > 0") Agregar ({{ countUsuariosParaImportar() }})
+        
         v-tooltip(top)
-          v-btn(icon, @click.native="", slot='activator')
+          v-btn(icon, @click.native="showDialogAddGrupo = true", slot='activator')
             v-icon group
           span Agregar Grupo
+          v-dialog(v-model='showDialogAddGrupo', persistent, scrollable, max-width='400px')
+            v-card
+              v-card-title.title Agregar Grupos
+              v-divider
+              v-layout(row, wrap, px-3)
+                v-flex.md12
+                  v-card-text(style='max-height: 300px;')
+                    v-subheader Personas
+                    div(v-for='grupo in gruposImportar', v-bind:key='grupo.id', style='height:30px;')
+                      v-checkbox(:label='grupo.nombre', v-model='grupo.select', light)
+                  v-divider
+                  v-card-actions
+                    v-spacer
+                    v-btn(color='grey darken-1', flat, @click.native='showDialogAddGrupo = false') Cancelar
+                    v-btn(color='green darken-1', flat, @click='agregarUsuarios', v-if="countUsuariosParaImportar() > 0") Agregar ({{ countUsuariosParaImportar() }})
+        
         v-tooltip(top)
           v-btn(icon, @click.native="", slot='activator')
             v-icon refresh
@@ -112,14 +130,16 @@
     components: { loader, imageprofile },
     data () {
       return {
-        tituloForm: 'Este es el titulo',
-        mensajeForm: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras suscipit pulvinar ante, nec porttitor neque pulvinar vel.',
+        tituloForm: '',
+        mensajeForm: '',
         imageForm: null,
-        showAlive: true,
+        showAlive: false,
         showDialogAddPersona: false,
+        showDialogAddGrupo: false,
         search: '',
         usuarios: [],
         usuariosImportar: [],
+        gruposImportar: [],
         loaderUsuarios: false,
         pagination: {
           sortBy: 'ci'
@@ -130,7 +150,8 @@
           { text: 'Documento', align: 'center', value: 'ci' },
           { text: 'Nombre', align: 'center', value: 'nombre' },
           { text: 'Grupo', value: 'nombre' }
-        ]
+        ],
+        messageImageLoader: 'Click o Arrastre Aqui (jpg, png, jpeg)'
       }
     },
     methods: {
@@ -178,6 +199,20 @@
         })
         console.log(this.usuariosImportar)
       },
+      getGruposImportar () {
+        this.gruposImportar = []
+        http.getAllGrupos().then(res => {
+          res.data.data.forEach(function (element) {
+            var bloqueado = false
+            let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, codigo: element.codigo, bloqueado: bloqueado }
+            this.usuariosImportar.push(temp)
+            console.log(element)
+          }, this)
+        }, (error) => {
+          console.log(error)
+        })
+        console.log(this.gruposImportar)
+      },
       makeImage () {
         return config.publicUrl + this.imageForm
       },
@@ -207,13 +242,31 @@
       handleDrop (e) { // arrastrar una imagen
         if (e.dataTransfer) {
           this.loading = true
+          let _this = this
           e.stopPropagation()
           e.preventDefault()
           var files = e.dataTransfer.files
           for (var i = 0; i < files.length; i++) {
             var f = files[i]
+            if (_this.validateFile(f)) {
+              var reader = new FileReader()
+              reader.onload = function (e) {
+                var data = e.target.result
+                _this.sendToList(data)
+              }
+              reader.readAsDataURL(f)
+            }
+          }
+        }
+      },
+      onFileChange (e) { // seleccionar una imagen
+        this.loading = true
+        let _this = this
+        var files = e.target.files || e.dataTransfer.files
+        for (var i = 0; i < files.length; i++) {
+          var f = files[i]
+          if (_this.validateFile(f)) {
             var reader = new FileReader()
-            let _this = this
             reader.onload = function (e) {
               var data = e.target.result
               _this.sendToList(data)
@@ -222,24 +275,26 @@
           }
         }
       },
-      onFileChange (e) { // seleccionar una imagen
-        this.loading = true
-        var files = e.target.files || e.dataTransfer.files
-        for (var i = 0; i < files.length; i++) {
-          var f = files[i]
-          var reader = new FileReader()
-          let _this = this
-          reader.onload = function (e) {
-            var data = e.target.result
-            _this.sendToList(data)
-          }
-          reader.readAsDataURL(f)
-        }
-      },
       handleDragover (e) {
         e.stopPropagation()
         e.preventDefault()
         e.dataTransfer.dropEffect = 'copy'
+      },
+      validateFile (f) { // Check if is a valid file
+        let extension = f.name.split('.').pop()
+        if (['png', 'jpg', 'jpeg'].includes(extension)) {
+          this.messageImageLoader = f.name
+          return true
+        } else {
+          this.messageImageLoader = 'Debe cargar un archivo con una extensión valida.', 'Archivo invalido'
+          // this.cancelFile()
+          this.imageForm = null
+          return false
+        }
+      },
+      cancelFile () {
+        this.messageImageLoader = 'Click o Arrastre Aqui (xls, xlsx, csv, ods)'
+        this.imageForm = null
       },
       sendToList (base64) { // agregar un elemento a la lista
         //this.imageForm = base64
@@ -256,6 +311,7 @@
         this.tituloForm = null
         this.mensajeForm = null
         this.imageForm = null
+        this.messageImageLoader = 'Click o Arrastre Aqui (jpg, png, jpeg)'
       },
       toggleAll () {
         if (this.selected.length) this.selected = []
@@ -281,6 +337,7 @@
     },
     created () {
       this.getUsuariosImportar()
+      this.getGruposImportar()
     }
   }
 </script>

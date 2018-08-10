@@ -34,6 +34,7 @@
               td.text-xs-center {{ limitText(props.item.mensaje) }}
               td.text-xs-center
                 img(:src="imagePath(props.item.imagen)", width="100", v-if="props.item.imagen != 'null'")
+              td.text-xs-center {{ props.item.fecha_creacion }}
               td.text-xs-center
                 v-chip(color='light-blue', text-color='white', v-if="checkResult(props.item.enviado)")
                   | {{ props.item.fecha_envio }}
@@ -89,7 +90,7 @@
         usuariosMensaje: [],
         loaderMain: false,
         search: '',
-        pagination: { sortBy: 'nombre' },
+        pagination: { sortBy: 'fecha_creacion', 'descending': true },
         pag: [10, 20, 50, { text: 'Todos', value: -1 }],
         headers: [
           { text: '', align: 'center' },
@@ -97,6 +98,7 @@
           { text: 'Titulo', align: 'center', value: 'titulo' },
           { text: 'Mensaje', align: 'center', value: 'mensaje' },
           { text: 'Imagen', align: 'center', value: 'imagen' },
+          { text: 'Creación', align: 'center', value: 'fecha_creacion' },
           { text: 'Enviado', align: 'center', value: 'enviado' }
         ],
         userheaders: [

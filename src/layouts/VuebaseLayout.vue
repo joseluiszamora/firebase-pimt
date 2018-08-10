@@ -251,9 +251,14 @@ export default {
       fixed: false,
       developItems: [
         {
-          icon: "supervisor_account",
+          icon: "person",
           title: "Usuarios",
           link: "/usuarios/index"
+        },
+        {
+          icon: "supervisor_account",
+          title: "Grupos",
+          link: "/usuarios/grupos"
         }
       ],
       analyticsItems: [
