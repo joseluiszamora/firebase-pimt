@@ -57,9 +57,10 @@
               v-layout(row, wrap, px-3)
                 v-flex.md12
                   v-card-text(style='max-height: 300px;')
-                    v-subheader Personas
-                    div(v-for='usuario in usuariosImportar', v-bind:key='usuario.id', style='height:30px;')
-                      v-checkbox(:label='usuario.nombre', v-model='usuario.select', light)
+                    // v-subheader
+                    v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="searchPersona")
+                  div(v-for='usuario in usuariosImportar', v-bind:key='usuario.id', v-if="usuario.visible", style='height:30px;')
+                    v-checkbox(:label='usuario.nombre', v-model='usuario.select', light)
                   v-divider
                   v-card-actions
                     v-spacer
@@ -137,6 +138,7 @@
         showDialogAddPersona: false,
         showDialogAddGrupo: false,
         search: '',
+        searchPersona: '',
         usuarios: [],
         usuariosImportar: [],
         gruposImportar: [],
@@ -184,14 +186,14 @@
         this.usuariosImportar = []
         http.getAllUsuarios().then(res => {
           res.data.data.forEach(function (element) {
-            var bloqueado = false
+            var bloqueado = true
             /* this.usuarios.forEach(function (usuario) {
               if (usuario.id === element.id) {
                 bloqueado = true
               }
             }, this) */
 
-            let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, ci: element.ci, bloqueado: bloqueado }
+            let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, ci: element.ci, bloqueado: bloqueado, visible: true }
             this.usuariosImportar.push(temp) 
           }, this)
         }, (error) => {
@@ -205,7 +207,7 @@
           res.data.data.forEach(function (element) {
             var bloqueado = false
             let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, codigo: element.codigo, bloqueado: bloqueado }
-            this.usuariosImportar.push(temp)
+            this.gruposImportar.push(temp)
             console.log(element)
           }, this)
         }, (error) => {
@@ -338,6 +340,22 @@
     created () {
       this.getUsuariosImportar()
       this.getGruposImportar()
+    },
+    watch: {
+      searchPersona (newVal, oldVal) {
+        if(newVal.length > 1) {
+          this.usuariosImportar.forEach(function (element) {
+            element.visible = false
+            if (element.nombre.includes(newVal)) {
+              element.visible = true
+            }
+          }, this)
+        } else { // clear search
+          this.usuariosImportar.forEach(function (element) {
+            element.visible = true
+          }, this)
+        }
+      }
     }
   }
 </script>
