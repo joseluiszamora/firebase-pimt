@@ -16,7 +16,9 @@
     "firebase-functions": "^1.1.0",
     "pug": "^2.0.3",
     "vue": "^2.5.16",
-    "vuetify": "^1.0.16"
+    "vuetify": "^1.0.16",
+    "vuex": "^3.0.1",
+    "v-img": "^0.1.9"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

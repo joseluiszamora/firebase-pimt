@@ -182,29 +182,29 @@
             <v-menu bottom left>
 							<v-btn icon slot="activator">
 								<v-avatar class="white" size="32">
-									<v-icon color="primary">person</v-icon>
+									<image-profile :src="getSession.imagen" :width="40"></image-profile>
 								</v-avatar>
 							</v-btn>
 							<v-list class="pa-0">
 								<v-list-tile avatar>
 									<v-list-tile-avatar>
 										<v-avatar class="primary" size="48px">
-											<v-icon dark>person</v-icon>
+											<image-profile :src="getSession.imagen" :width="50"></image-profile>
 										</v-avatar>
 									</v-list-tile-avatar>
 									<v-list-tile-content>
-										<v-list-tile-title>John Doe</v-list-tile-title>
-										<v-list-tile-sub-title>Administrator</v-list-tile-sub-title>
+										<v-list-tile-title>{{ getSession.username }}</v-list-tile-title>
+										<!--<v-list-tile-sub-title>Administrator</v-list-tile-sub-title>-->
 									</v-list-tile-content>
 								</v-list-tile>
 								<v-divider></v-divider>
 
-								<v-list-tile key="lock_open">
+								<v-list-tile key="lock_open" @click="logout()">
 									<v-list-tile-action>
 										<v-icon>lock_open</v-icon>
 									</v-list-tile-action>
 									<v-list-tile-content>
-										<v-list-tile-title>Logout</v-list-tile-title>
+										<v-list-tile-title>Salir</v-list-tile-title>
 									</v-list-tile-content>
 								</v-list-tile>
 							</v-list>
@@ -253,9 +253,12 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import ImageProfile from '@/components/Shared/Imageprofile'
+
 export default {
   name: "VuebaseLayout",
-
+	components: { ImageProfile },
   data() {
     return {
       drawer: true,
@@ -328,7 +331,9 @@ export default {
       search: ""
     };
   },
-
+  computed: {
+    ...mapGetters(['getSession'])
+  },
   methods: {
     onBlur() {
       this.searching = false;
@@ -344,47 +349,52 @@ export default {
       this.searching = false;
       this.search = "";
       document.querySelector("#search").blur();
+		},
+		
+		logout () {
+			console.log('logout')
+      this.$store.commit('logout')
     }
   }
 };
 </script>
 
 <style scoped lang="stylus">
-@import '../../node_modules/vuetify/src/stylus/settings/_variables.styl';
+	@import '../../node_modules/vuetify/src/stylus/settings/_variables.styl';
 
-.bottom-menu {
-	position: absolute;
-	width: 100%;
-	bottom: 0;
-}
-
-.searching {
-	overflow: hidden;
-	width: 208px;
-	padding-left: 8px;
-	transition: $primary-transition;
-}
-
-.searching--closed {
-	padding-left: 0;
-	width: 0;
-}
-
-.searching > * {
-	right: 8px;
-}
-
-.searching--closed > * {
-	display: none;
-}
-
-.hidden-searching {
-	@media $display-breakpoints.sm-and-down {
-		display: none !important;
+	.bottom-menu {
+		position: absolute;
+		width: 100%;
+		bottom: 0;
 	}
-}
 
-.list-border-bottom {
-	border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
+	.searching {
+		overflow: hidden;
+		width: 208px;
+		padding-left: 8px;
+		transition: $primary-transition;
+	}
+
+	.searching--closed {
+		padding-left: 0;
+		width: 0;
+	}
+
+	.searching > * {
+		right: 8px;
+	}
+
+	.searching--closed > * {
+		display: none;
+	}
+
+	.hidden-searching {
+		@media $display-breakpoints.sm-and-down {
+			display: none !important;
+		}
+	}
+
+	.list-border-bottom {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+	}
 </style>

@@ -143,7 +143,7 @@ export default {
     }
   },
   created () {
-    let token = this.$route.query.access_token
+    /* let token = this.$route.query.access_token
     
     if (token != null) {
       console.log(token)
@@ -151,7 +151,7 @@ export default {
       //this.decodeToken(token)
     } else {
       //this.redirectToLogin()
-    }
+    }*/
   }
 };
 </script>

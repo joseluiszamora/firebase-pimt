@@ -18,7 +18,7 @@ const store = new Vuex.Store({
       tipoUsuario: localStorage.getItem('tipoUsuario') || '',
       ci: localStorage.getItem('ci') || '',
       nombreCompleto: localStorage.getItem('nombreCompleto') || '',
-      idUsuario: localStorage.getItem('idUsuario') || ''
+      imagen: localStorage.getItem('imagen') || ''
     }
   },
   mutations: {
@@ -32,14 +32,14 @@ const store = new Vuex.Store({
       state.session.tipoUsuario = payload.tipoUsuario
       state.session.ci = payload.ci
       state.session.nombreCompleto = payload.nombreCompleto
-      state.session.idUsuario = payload.idUsuario
+      state.session.imagen = payload.imagen
       // save fullname && Token in local Storage
       localStorage.setItem('token', payload.token || '')
       localStorage.setItem('username', payload.username || '')
       localStorage.setItem('tipoUsuario', payload.tipoUsuario || '')
       localStorage.setItem('ci', payload.ci || '')
       localStorage.setItem('nombreCompleto', payload.nombreCompleto || '')
-      localStorage.setItem('idUsuario', payload.idUsuario || '')
+      localStorage.setItem('imagen', payload.imagen || '')
       router.push('/')
     },
     logout (state) {
@@ -50,11 +50,12 @@ const store = new Vuex.Store({
       localStorage.removeItem('tipoUsuario')
       localStorage.removeItem('ci')
       localStorage.removeItem('nombreCompleto')
-      localStorage.removeItem('idUsuario')
+      localStorage.removeItem('imagen')
       state.session.username = ''
       state.session.token = ''
       console.log('bye')
-      router.push('/login')
+      // router.push('/login')
+      location.href = config.plataformaTeleferico
     },
     setPageTitle (state, payload) {
       state.layout.title = payload
