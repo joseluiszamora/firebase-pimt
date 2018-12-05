@@ -1,6 +1,6 @@
 <template lang="pug">
   v-card(color='white')
-    v-toolbar(color='primary', dark)
+    v-toolbar(color='amber darken-3', dark)
       v-toolbar-title Todas mis Facturas
       v-spacer
       v-btn(icon, dark, @click.native="getAllFacturas")

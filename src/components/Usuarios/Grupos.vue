@@ -3,8 +3,7 @@
     v-layout(row, wrap)
       v-flex.md6
         v-card(color='white')
-          v-toolbar(color='primary', dark)
-            v-toolbar-side-icon
+          v-toolbar(color='amber darken-3', dark)
             v-toolbar-title Todos los Grupos
             v-spacer
             v-btn(icon, dark, @click.native="showDialogNewGroup = true")
@@ -61,7 +60,7 @@
 <script>
   import http from '@/http/backend'
   import loader from '../Shared/Loader.vue'
-  import imageprofile from '../Shared/Imageprofile.vue'
+  import imageprofile from '../Shared/Imagerrhh.vue'
   import personasGrupo from '../Usuarios/PersonasGrupo.vue'
   export default {
     components: { loader, imageprofile, personasGrupo },

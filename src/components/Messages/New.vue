@@ -10,8 +10,7 @@
           v-btn(color='primary darken-1', flat='', @click='sendMessageLater') Enviar Luego
           v-btn(color='green darken-1', flat='', @click='sendMessageNow') Enviar Ahora
     v-card(color='white')
-      v-toolbar(color='primary', dark)
-        v-toolbar-side-icon
+      v-toolbar(color='amber darken-3', dark)
         v-toolbar-title Nuevo Mensaje
         v-spacer
         v-tooltip(top)
@@ -39,8 +38,7 @@
                 v-btn(dark, color='orange', @click='clear')
                   v-icon refresh
                 v-btn(dark, color='green', @click='submit')
-                  |
-                  Guardar 
+                  | Guardar 
                   v-icon save
         v-flex.md6(v-if="showAlive")
           v-slide-y-transition(mode="out-in")
@@ -52,7 +50,7 @@
                   img(:src="makeImage()", height="300")
 
     v-card(color='white')
-      v-toolbar(color='primary', dark)
+      v-toolbar(color='amber darken-3', dark)
         v-toolbar-title Enviar a :
         v-spacer
         

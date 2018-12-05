@@ -1,6 +1,6 @@
 <template lang="pug">
   v-card(color='white')
-    v-toolbar(color='primary', dark)
+    v-toolbar(color='amber darken-3', dark)
       v-toolbar-title Grupo: {{ grupo.nombre }}
       v-spacer
       v-btn(icon, dark, @click.native="launchDialogGroup")
@@ -61,7 +61,7 @@
 <script>
   import http from '@/http/backend'
   import loader from '../Shared/Loader.vue'
-  import imageprofile from '../Shared/Imageprofile.vue'
+  import imageprofile from '../Shared/Imagerrhh.vue'
   export default {
     components: { loader, imageprofile },
     props: {

@@ -3,7 +3,7 @@
         <v-toolbar
             dense
             tabs
-            color="primary"
+            color="amber darken-3"
             dark>
             <v-toolbar-title class="pl-2">Mensajes</v-toolbar-title>
             <v-spacer></v-spacer>
