@@ -178,16 +178,6 @@
 								</v-list-tile>
 								<v-divider></v-divider>
 
-								<v-list-tile key="profile" @click="">
-									<v-list-tile-action>
-										<v-icon>person</v-icon>
-									</v-list-tile-action>
-									<v-list-tile-content>
-										<v-list-tile-title>My Profile</v-list-tile-title>
-									</v-list-tile-content>
-								</v-list-tile>
-								<v-divider></v-divider>
-
 								<v-list-tile key="lock_open" @click="">
 									<v-list-tile-action>
 										<v-icon>lock_open</v-icon>

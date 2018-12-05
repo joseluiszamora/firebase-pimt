@@ -95,9 +95,30 @@
 
 						<v-divider></v-divider>
 
-						<v-list subheader :class="{'list-border-bottom' : miniVariant}">
+						<!--<v-list subheader :class="{'list-border-bottom' : miniVariant}">
 							<v-subheader>NOTIFICACIONES</v-subheader>
 							<template v-for="item in notificactions">
+								<v-tooltip right :disabled="!miniVariant">
+									<v-list-tile
+										:key="item.icon"
+										:to="item.link"
+										exact
+										slot="activator">
+											<v-list-tile-action>
+												<v-icon v-html="item.icon"></v-icon>
+											</v-list-tile-action>
+											<v-list-tile-content>
+												<v-list-tile-title v-text="item.title"></v-list-tile-title>
+											</v-list-tile-content>
+									</v-list-tile>
+									<span v-text="item.title"></span>
+								</v-tooltip>
+							</template>
+            </v-list>-->
+
+						<v-list subheader :class="{'list-border-bottom' : miniVariant}">
+							<v-subheader>FACTURAS</v-subheader>
+							<template v-for="item in facturas">
 								<v-tooltip right :disabled="!miniVariant">
 									<v-list-tile
 										:key="item.icon"
@@ -122,7 +143,7 @@
 					app
 					flat
 					dense
-					color="primary"
+					color="amber darken-3"
 					dark>
             <v-toolbar-side-icon
 							@click.stop="drawer = !drawer"
@@ -132,7 +153,7 @@
 
             <v-spacer></v-spacer>
 
-            <v-btn icon @click.native.stop="searchBegin">
+            <!--<v-btn icon @click.native.stop="searchBegin">
 							<v-icon>search</v-icon>
             </v-btn>
             <div :class="{'searching--closed': !searching}" class="searching">
@@ -157,7 +178,7 @@
 							</v-btn>
 							<span>2 notificationes nuevas</span>
             </v-tooltip>
-
+						-->
             <v-menu bottom left>
 							<v-btn icon slot="activator">
 								<v-avatar class="white" size="32">
@@ -178,17 +199,7 @@
 								</v-list-tile>
 								<v-divider></v-divider>
 
-								<v-list-tile key="profile" @click="">
-									<v-list-tile-action>
-										<v-icon>person</v-icon>
-									</v-list-tile-action>
-									<v-list-tile-content>
-										<v-list-tile-title>My Profile</v-list-tile-title>
-									</v-list-tile-content>
-								</v-list-tile>
-								<v-divider></v-divider>
-
-								<v-list-tile key="lock_open" @click="">
+								<v-list-tile key="lock_open">
 									<v-list-tile-action>
 										<v-icon>lock_open</v-icon>
 									</v-list-tile-action>
@@ -219,7 +230,7 @@
             </v-toolbar>
             <v-list subheader dense>
 							<v-subheader>All notifications</v-subheader>
-							<v-list-tile @click="">
+							<v-list-tile>
 								<v-list-tile-action>
 									<v-icon>person_add</v-icon>
 								</v-list-tile-action>
@@ -228,7 +239,7 @@
 								</v-list-tile-title>
 							</v-list-tile>
 							<v-divider></v-divider>
-							<v-list-tile @click="">
+							<v-list-tile>
 								<v-list-tile-action>
 									<v-icon>data_usage</v-icon>
 								</v-list-tile-action>
@@ -283,6 +294,11 @@ export default {
           icon: "comment",
           title: "mensajes",
           link: "/messages/index"
+        },
+        {
+          icon: "playlist_add",
+          title: "Nuevo Mensaje",
+          link: "/messages/new"
         }
       ],
       notificactions: [
@@ -290,6 +306,13 @@ export default {
           icon: "notifications",
           title: "Avisos",
           link: ""
+        }
+      ],
+      facturas: [
+        {
+          icon: "notifications",
+          title: "Facturas",
+          link: "/facturas/index"
         }
       ],
       miniVariant: false,

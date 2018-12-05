@@ -69,6 +69,18 @@ const routes = [
         component: () => import('@/components/Usuarios/Grupos')
       }
     ]
+  },
+  {
+    path: '/facturas',
+    name: 'facturas',
+    component: () => import('@/components/Facturas/Layout'),
+    children: [
+      {
+        path: 'index',
+        name: 'facturas.index',
+        component: () => import('@/components/Facturas/Index')
+      }
+    ]
   }
 ]
 

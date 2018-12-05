@@ -1,5 +1,14 @@
 <template lang="pug">
   div
+    v-dialog(v-model='dialogSendNow', persistent='', max-width='290')
+      v-card
+        v-card-title.headline Enviar mensaje ahora?
+        v-card-text
+          | Puede enviar este mensaje ahora mismo o elegir enviarlo posteriormente.
+        v-card-actions
+          v-spacer
+          v-btn(color='primary darken-1', flat='', @click='sendMessageLater') Enviar Luego
+          v-btn(color='green darken-1', flat='', @click='sendMessageNow') Enviar Ahora
     v-card(color='white')
       v-toolbar(color='primary', dark)
         v-toolbar-side-icon
@@ -30,7 +39,8 @@
                 v-btn(dark, color='orange', @click='clear')
                   v-icon refresh
                 v-btn(dark, color='green', @click='submit')
-                  | Guardar 
+                  |
+                  Guardar 
                   v-icon save
         v-flex.md6(v-if="showAlive")
           v-slide-y-transition(mode="out-in")
@@ -55,12 +65,13 @@
               v-card-title.title Agregar Personas
               v-divider
               v-layout(row, wrap, px-3)
-                v-flex.md12
-                  v-card-text(style='max-height: 300px;')
-                    // v-subheader
+                v-flex.md12(style='overflow:hidden;')
+                  v-card-text
                     v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="searchPersona")
-                  div(v-for='usuario in usuariosImportar', v-bind:key='usuario.id', v-if="usuario.visible", style='height:30px;')
-                    v-checkbox(:label='usuario.nombre', v-model='usuario.select', light)
+                  v-divider
+                  div(style='height: 600px;overflow:auto;')
+                    div(v-for='usuario in usuariosImportar', v-bind:key='usuario.id', v-if="usuario.visible", style='height:30px;')
+                      v-checkbox(:label='usuario.nombre', v-model='usuario.select', light)
                   v-divider
                   v-card-actions
                     v-spacer
@@ -77,15 +88,16 @@
               v-divider
               v-layout(row, wrap, px-3)
                 v-flex.md12
-                  v-card-text(style='max-height: 300px;')
-                    v-subheader Personas
-                    div(v-for='grupo in gruposImportar', v-bind:key='grupo.id', style='height:30px;')
-                      v-checkbox(:label='grupo.nombre', v-model='grupo.select', light)
+                  v-card-text(style='overflow:hidden;')
+                    v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="searchGrupo")
+                    div(style='overflow:auto;max-height: 300px;')
+                      div(v-for='grupo in gruposImportar', v-bind:key='grupo.id', v-if="grupo.visible", style='height:30px;')
+                        v-checkbox(:label='grupo.nombre', v-model='grupo.select', light)
                   v-divider
                   v-card-actions
                     v-spacer
                     v-btn(color='grey darken-1', flat, @click.native='showDialogAddGrupo = false') Cancelar
-                    v-btn(color='green darken-1', flat, @click='agregarUsuarios', v-if="countUsuariosParaImportar() > 0") Agregar ({{ countUsuariosParaImportar() }})
+                    v-btn(color='green darken-1', flat, @click='agregarGrupos', v-if="countGruposParaImportar() > 0") Agregar ({{ countGruposParaImportar() }})
         
         v-tooltip(top)
           v-btn(icon, @click.native="", slot='activator')
@@ -139,10 +151,13 @@
         showDialogAddGrupo: false,
         search: '',
         searchPersona: '',
+        searchGrupo: '',
         usuarios: [],
         usuariosImportar: [],
         gruposImportar: [],
         loaderUsuarios: false,
+        dialogSendNow: false,
+        idMensaje: 0,
         pagination: {
           sortBy: 'ci'
         },
@@ -157,6 +172,15 @@
       }
     },
     methods: {
+      sendMessageLater () {
+        this.dialogSendNow = false
+        this.clear()
+      },
+      sendMessageNow () {
+        this.sendMessage()
+        this.dialogSendNow = false
+        this.clear()
+      },
       quitarUsuarios () {
         this.selected.forEach(function (element) {
           var index = this.usuarios.indexOf(element)
@@ -168,14 +192,62 @@
           if (element.select) {
             console.log(element)
             element.select = false
-            this.usuarios.push(element)
             this.showDialogAddPersona = false
+
+            if (!this.checkIfExist(element.id)) {
+              this.usuarios.push(element)
+            }
           }
         }, this)
+      },
+      agregarGrupos () {
+        this.gruposImportar.forEach(function (element) {
+          if (element.select) {
+            console.log(element)
+            element.select = false
+            //this.usuarios.push(element)
+            this.showDialogAddGrupo = false
+
+            http.getUsuariosGrupo(element.id).then(res => {
+              res.data.data.forEach(function (element) {
+                var bloqueado = true
+                let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, ci: element.ci, bloqueado: bloqueado, visible: true }
+                
+                if (!this.checkIfExist(element.id)) {
+                  this.usuarios.push(temp) 
+                }
+              }, this)
+            }, (error) => {
+              console.log(error)
+            })
+
+
+          }
+        }, this)
+      },
+      checkIfExist (idSend) {
+        console.log(idSend)
+        let response = false
+        this.usuarios.forEach(function (element) {
+          if (element.id === idSend) {
+            console.log('EXiist')
+            response = true
+          }
+        }, this)
+        return response
       },
       countUsuariosParaImportar () {
         let counter = 0
         this.usuariosImportar.forEach(function (element) {
+          if (element.select) {
+            counter++
+          }
+        }, this)
+        return counter
+      },
+      countGruposParaImportar () {
+        let counter = 0
+        this.gruposImportar.forEach(function (element) {
           if (element.select) {
             counter++
           }
@@ -205,8 +277,8 @@
         this.gruposImportar = []
         http.getAllGrupos().then(res => {
           res.data.data.forEach(function (element) {
-            var bloqueado = false
-            let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, codigo: element.codigo, bloqueado: bloqueado }
+            var bloqueado = true
+            let temp = { select: !bloqueado, id: element.id, nombre: element.nombre, codigo: element.codigo, bloqueado: bloqueado, visible: true }
             this.gruposImportar.push(temp)
             console.log(element)
           }, this)
@@ -225,19 +297,31 @@
         return 'md12'
       },
       closeForm () {
-      },
-      clear () {
       }, 
       submit () {
-        var usuarios = ''
-        this.usuarios.forEach(function (element) {
-          usuarios += element.id + '-' + element.ci + '|'
-        }, this)
-        const mensaje = `titulo=${this.tituloForm}&mensaje=${this.mensajeForm}&imagen=${this.imageForm}&usuarios=${usuarios}`
-        http.saveMensaje(mensaje).then(res => {
-          console.log(res)
+        if(this.tituloForm != '' && this.mensajeForm != '' && usuarios != ''){
+          var usuarios = ''
+          this.usuarios.forEach(function (element) {
+            usuarios += element.id + '-' + element.ci + '|'
+          }, this)
+          const mensaje = `titulo=${this.tituloForm}&mensaje=${this.mensajeForm}&imagen=${this.imageForm}&usuarios=${usuarios}`
+          http.saveMensaje(mensaje).then(res => {
+            this.idMensaje = res.data.id_mensaje
+            console.log(res.data.id_mensaje)
+            this.dialogSendNow = true
+          }, (error) => {
+            this.showError = true
+            console.log(error)
+          })
+        } else {
+          alert('Datos incompletos.')
+        }
+      },
+      sendMessage () {
+        const mensaje = `id_mensaje=${this.idMensaje}`
+        http.sendMessage(mensaje).then(res => {
+          console.log(res.data)
         }, (error) => {
-          this.showError = true
           console.log(error)
         })
       },
@@ -352,6 +436,22 @@
           }, this)
         } else { // clear search
           this.usuariosImportar.forEach(function (element) {
+            element.visible = true
+          }, this)
+        }
+      },
+      searchGrupo (newVal, oldVal) {
+        if(newVal.length > 1) {
+          this.gruposImportar.forEach(function (element) {
+            // console.log(element.nombre)
+            element.visible = false
+            if (element.nombre.includes(newVal)) {
+              console.log(element.nombre)
+              element.visible = true
+            }
+          }, this)
+        } else { // clear search
+          this.gruposImportar.forEach(function (element) {
             element.visible = true
           }, this)
         }

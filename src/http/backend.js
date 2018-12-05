@@ -55,5 +55,12 @@ http.sendMessage = function (mensaje) {
   return http.post('/mensaje/send', mensaje)
 }
 
+// Facturas
+http.getAllFacturas = function () {
+  return http.get('/factura/todos')
+}
+http.deleteFactura = function (id) {
+  return http.post('/factura/delete', `id=${id}`)
+}
 
 export default http

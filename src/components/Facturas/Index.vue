@@ -1,22 +1,26 @@
 <template lang="pug">
   v-card(color='white')
     v-toolbar(color='primary', dark)
-      v-toolbar-title Todos los Usuarios
+      v-toolbar-title Todas mis Facturas
       v-spacer
-      v-btn(icon, dark, @click.native="getAllUsuarios")
+      v-btn(icon, dark, @click.native="getAllFacturas")
         v-icon refresh
+      v-tooltip(top)
+        v-btn(flat, icon, dark, slot='activator', :href="urlReportExcel" target="_blank")
+          v-icon save
+        span Reporte Excel
     v-layout(row, wrap, justify-end)
       v-flex.md6
         v-text-field(append-icon="search", label="Buscar...", single-line hide-details, v-model="search")
     v-layout(row, wrap, pt-3)
       v-flex.md12
-        loader(message="Cargando Usuarios", v-show="loaderUsuarios")
+        loader(message="Cargando Facturas", v-show="loaderFactura")
         v-data-table.elevation-1(
           v-model="selected", 
           :headers="headers", 
-          :items="usuarios", 
+          :items="facturas", 
           :search="search", 
-           v-show="!loaderUsuarios" 
+           v-show="!loaderFactura" 
            :rows-per-page-items="pag" 
           :pagination.sync="pagination", select-all, item-key="id")
           template(slot="headers", slot-scope="props")
@@ -26,63 +30,73 @@
                 | {{ header.text }}
           template(slot="items", slot-scope="props")
             tr(:active="props.selected", @click="props.selected = !props.selected")
-              td
-                v-tooltip(top)
-                  imageprofile(:documento="props.item.ci || 'null'", :width="100", slot='activator')
-                  span {{ props.item.nombre }}
-              td.text-xs-center {{ props.item.ci }}
-              // td.text-xs-center {{ props.item.nombre_usuario }}
-              td.text-xs-center {{ props.item.nombre }}
-              td.text-xs-center {{ props.item.ultimo_ingreso }}
+              td.text-xs-center {{ props.item.nit }}
+              td.text-xs-center {{ props.item.factura }}
+              td.text-xs-center {{ props.item.auth }}
+              td.text-xs-center {{ props.item.control }}
+              td.text-xs-center {{ props.item.fecha }}
+              td.text-xs-center {{ props.item.nitci }}
+              td.text-xs-center {{ props.item.monto }}
               td.text-xs-center
-                v-chip(color="red", text-color="white", v-if="props.item.baja_logica > 0") Inactivo
-                v-chip(color="green", text-color="white", v-else) Activo
+                v-btn(round, color="error", @click.native="deleteFactura(props.item.id)") Eliminar
 </template>
 
 <script>
   import http from '@/http/backend'
   import loader from '../Shared/Loader.vue'
   import imageprofile from '../Shared/Imageprofile.vue'
+import { log } from 'util';
   export default {
     components: { loader, imageprofile },
     data () {
       return {
         tituloForm: 'Este es el titulo',
-        mensajeForm: 'Lorem ipsum dolor sit amet.',
+        mensajeForm: 'Lorem ipsum.',
         imageForm: null,
         showAlive: true,
-        usuarios: [],
+        facturas: [],
         search: '',
-        loaderUsuarios: false,
+        loaderFactura: false,
+        urlReportExcel: 'http://pimt.miteleferico.bo/api/factura/excel',
         pagination: {
-          sortBy: 'ultimo_ingreso',
-          descending: true
+          sortBy: 'ci'
         },
         selected: [],
         headers: [
-          { text: '', value: 'id' },
-          { text: 'Documento', align: 'center', value: 'ci' },
-          //{ text: 'Usuario', align: 'center', value: 'nombre_usuario' },
-          { text: 'Nombre', align: 'center', value: 'nombre' },
-          { text: 'Ultimo Ingreso', align: 'center', value: 'ultimo_ingreso' },
-          { text: 'Estado', align: 'center', value: 'baja_logica' }
+          { text: 'Nit', align: 'center', value: 'nit' },
+          { text: 'Factura', align: 'center', value: 'factura' },
+          { text: 'Autorización', align: 'center', value: 'auth' },
+          { text: 'Codigo de Control', align: 'center', value: 'control' },
+          { text: 'Fecha', align: 'center', value: 'fecha' },
+          { text: 'Nit/Ci', align: 'center', value: 'nitci' },
+          { text: 'Monto', align: 'center', value: 'monto' }
         ],
         pag: [10, 20, 50, { text: 'Todos', value: -1 }]
       }
     },
     methods: {
-      getAllUsuarios () {
-        this.loaderUsuarios = true
-        http.getAllUsuarios().then(res => {
-          this.usuarios = res.data.data
-          this.loaderUsuarios = false
+      getAllFacturas () {
+        this.loaderFactura = true
+        http.getAllFacturas().then(res => {
+          this.facturas = res.data.data
+          this.loaderFactura = false
         }, (error) => {
           console.log(error)
         })
       },
+      deleteFactura (id) {
+        http.deleteFactura(id).then(res => {
+          this.getAllFacturas()
+        }, (error) => {
+          console.log(error)
+        })
+      },
+      reportTxt () {
+        console.log("Report")
+      },
       toggleAll () {
         if (this.selected.length) this.selected = []
-        else this.selected = this.usuarios.slice()
+        else this.selected = this.facturas.slice()
       },
       changeSort (column) {
         if (this.pagination.sortBy === column) {
@@ -94,7 +108,7 @@
       }
     },
     created () {
-      this.getAllUsuarios()
+      this.getAllFacturas()
     }
   }
 </script>
